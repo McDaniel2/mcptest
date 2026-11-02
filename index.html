@@ -3,50 +3,801 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mcptest 首页</title>
+    <title>McDaniel · 立体个人主页</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* ===== 全局变量 ===== */
+        :root {
+            --bg: #0a0e27;
+            --bg-2: #0f1535;
+            --card: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.08);
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff2e63;
+            --neon-yellow: #ffe66d;
+            --neon-purple: #a855f7;
+            --text: #e8eaf6;
+            --text-dim: #8b93b7;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        /* 背景星光 + 渐变光晕 */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(168,85,247,0.18) 0%, transparent 35%),
+                radial-gradient(circle at 85% 60%, rgba(0,245,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 90%, rgba(255,46,99,0.12) 0%, transparent 45%);
+            z-index: -2; pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.15;
+            z-index: -1; pointer-events: none;
+        }
+
+        /* ===== 导航 ===== */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.2rem 3rem;
+            background: rgba(10,14,39,0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+        .logo {
+            font-weight: 700; font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--text-dim); text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-links a:hover { color: var(--neon-cyan); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -6px; left: 0;
+            width: 0; height: 2px;
+            background: var(--neon-cyan);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        section {
             min-height: 100vh;
-            display: flex;
+            padding: 8rem 3rem 4rem;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative;
+        }
+        .section-title {
+            font-size: 0.85rem; letter-spacing: 4px;
+            color: var(--neon-cyan); text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.6rem;
+        }
+        .section-heading {
+            font-size: 3rem; font-weight: 700;
+            margin-bottom: 3rem; text-align: center;
+        }
+        .section-heading span {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ============================================ */
+        /* 模块 1: Hero 立体工牌                       */
+        /* ============================================ */
+        #hero {
+            perspective: 1500px;
+        }
+        .lanyard {
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            transform-style: preserve-3d;
+            animation: badge-sway 6s ease-in-out infinite;
+        }
+        @keyframes badge-sway {
+            0%,100% { transform: rotateZ(-2deg); }
+            50% { transform: rotateZ(2deg); }
+        }
+        .lanyard-ring {
+            width: 60px; height: 60px;
+            border: 4px solid var(--neon-yellow);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255,230,109,0.5), inset 0 0 20px rgba(255,230,109,0.3);
+            margin-bottom: -8px; z-index: 2;
+            background: radial-gradient(circle, rgba(255,230,109,0.1), transparent);
+        }
+        .lanyard-string {
+            width: 4px; height: 60px;
+            background: linear-gradient(180deg, var(--neon-yellow), rgba(255,230,109,0.2));
+            box-shadow: 0 0 10px rgba(255,230,109,0.4);
+        }
+        .badge {
+            width: 340px; height: 480px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+        }
+        .badge:hover { transform: rotateY(180deg); }
+        .badge-face {
+            position: absolute; inset: 0;
+            border-radius: 20px;
+            backface-visibility: hidden;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .badge-front {
+            background: linear-gradient(160deg, #131a3e 0%, #0a0e27 100%);
+            box-shadow:
+                0 30px 60px rgba(0,0,0,0.5),
+                0 0 60px rgba(0,245,255,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            padding: 2rem;
+            display: flex; flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
-            color: #fff;
         }
-        .card {
-            text-align: center;
-            padding: 3rem 4rem;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        .badge-front::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
         }
-        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        p { font-size: 1.1rem; opacity: 0.9; }
-        .meta { margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.7; }
-        .btn {
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 0.7rem 1.5rem;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            text-decoration: none;
+        .badge-header {
+            font-size: 0.7rem; letter-spacing: 3px;
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            align-self: flex-start;
+        }
+        .avatar {
+            width: 130px; height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; font-weight: 700; color: var(--bg);
+            margin: 1.5rem 0 1rem;
+            box-shadow: 0 10px 30px rgba(0,245,255,0.4), inset 0 -10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .avatar::after {
+            content: ''; position: absolute; inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,245,255,0.3);
+            animation: pulse-ring 3s infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        .badge-name {
+            font-size: 1.6rem; font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .badge-role {
+            color: var(--neon-pink); font-size: 0.95rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 1.5rem;
+        }
+        .badge-info {
+            width: 100%; margin-top: auto;
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border);
+        }
+        .badge-info span strong { color: var(--neon-yellow); display: block; font-size: 0.9rem; }
+        .badge-back {
+            background: linear-gradient(160deg, #1a1240 0%, #0a0e27 100%);
+            transform: rotateY(180deg);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 60px rgba(255,46,99,0.2);
+            padding: 2rem;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+        .badge-back::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-yellow));
+        }
+        .qr-mock {
+            width: 140px; height: 140px;
+            background:
+                linear-gradient(45deg, var(--text) 25%, transparent 25%) 0 0/20px 20px,
+                linear-gradient(-45deg, var(--text) 25%, transparent 25%) 0 0/20px 20px,
+                var(--bg-2);
+            border-radius: 10px;
+            border: 8px solid var(--text);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .badge-back h3 { color: var(--neon-cyan); margin-bottom: 0.5rem; }
+        .badge-back p { color: var(--text-dim); font-size: 0.85rem; }
+        .hero-intro {
+            margin-top: 3rem; text-align: center;
+            max-width: 600px;
+        }
+        .hero-intro h1 {
+            font-size: 2.2rem; font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+        .hero-intro h1 strong { font-weight: 700; }
+        .hero-intro p { color: var(--text-dim); font-size: 1rem; }
+        .scroll-hint {
+            position: absolute; bottom: 2rem;
+            color: var(--text-dim); font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ============================================ */
+        /* 模块 2: 关于我 - 3D 视差卡片               */
+        /* ============================================ */
+        .about-stage {
+            perspective: 1200px;
+            width: 100%; max-width: 900px;
+        }
+        .about-card {
+            position: relative;
+            background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3.5rem;
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out;
+            box-shadow:
+                0 30px 60px rgba(0,0,0,0.4),
+                0 0 80px rgba(168,85,247,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .about-card::before {
+            content: ''; position: absolute; inset: -1px;
+            border-radius: 24px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--neon-purple), transparent 50%, var(--neon-cyan));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .about-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;
+            transform: translateZ(40px);
+        }
+        .about-text h3 {
+            font-size: 1.6rem; margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .about-text p { color: var(--text-dim); margin-bottom: 1rem; }
+        .about-stats { display: flex; flex-direction: column; gap: 1.2rem; }
+        .stat-item {
+            display: flex; justify-content: space-between; align-items: baseline;
+            padding: 1rem 1.2rem;
+            background: rgba(0,0,0,0.25);
+            border-left: 3px solid var(--neon-cyan);
             border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.3);
-            transition: all 0.3s;
+            transform: translateZ(60px);
         }
-        .btn:hover { background: rgba(255,255,255,0.3); }
+        .stat-item:nth-child(2) { border-color: var(--neon-pink); transform: translateZ(80px); }
+        .stat-item:nth-child(3) { border-color: var(--neon-yellow); transform: translateZ(60px); }
+        .stat-item strong {
+            font-size: 1.8rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-item span { color: var(--text-dim); font-size: 0.85rem; }
+        .stat-item:nth-child(1) strong { color: var(--neon-cyan); }
+        .stat-item:nth-child(2) strong { color: var(--neon-pink); }
+        .stat-item:nth-child(3) strong { color: var(--neon-yellow); }
+
+        /* ============================================ */
+        /* 模块 3: 技能 - 立体文件夹                    */
+        /* ============================================ */
+        .folders {
+            display: flex; gap: 3rem; flex-wrap: wrap;
+            justify-content: center; max-width: 1100px;
+            perspective: 1000px;
+        }
+        .folder {
+            width: 220px; cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        .folder:hover { transform: translateY(-15px) rotateX(-5deg); }
+        .folder-tab {
+            height: 28px; width: 70%;
+            background: linear-gradient(180deg, var(--neon-cyan), #0099b8);
+            border-radius: 8px 8px 0 0;
+            margin: 0 0 0 15%;
+            position: relative; z-index: 2;
+            box-shadow: 0 -4px 10px rgba(0,245,255,0.3);
+        }
+        .folder:nth-child(2) .folder-tab { background: linear-gradient(180deg, var(--neon-pink), #b01846); box-shadow: 0 -4px 10px rgba(255,46,99,0.3); }
+        .folder:nth-child(3) .folder-tab { background: linear-gradient(180deg, var(--neon-yellow), #b09030); box-shadow: 0 -4px 10px rgba(255,230,109,0.3); }
+        .folder:nth-child(4) .folder-tab { background: linear-gradient(180deg, var(--neon-purple), #6b21a8); box-shadow: 0 -4px 10px rgba(168,85,247,0.3); }
+        .folder-body {
+            background: linear-gradient(160deg, #1a2348 0%, #0f1535 100%);
+            border: 1px solid var(--border);
+            border-radius: 4px 8px 8px 8px;
+            padding: 1.8rem 1.5rem;
+            min-height: 220px;
+            position: relative;
+            box-shadow:
+                0 20px 40px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            transform-style: preserve-3d;
+        }
+        .folder-body::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent);
+            border-radius: 4px 8px 0 0;
+            pointer-events: none;
+        }
+        .folder h3 {
+            font-size: 1.1rem; margin-bottom: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .folder:nth-child(1) h3 { color: var(--neon-cyan); }
+        .folder:nth-child(2) h3 { color: var(--neon-pink); }
+        .folder:nth-child(3) h3 { color: var(--neon-yellow); }
+        .folder:nth-child(4) h3 { color: var(--neon-purple); }
+        .skill-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .skill-pill {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            text-align: center;
+            transition: all 0.3s;
+            transform: translateZ(20px);
+        }
+        .folder:hover .skill-pill {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+        }
+
+        /* ============================================ */
+        /* 模块 4: 项目墙 - 3D 悬浮卡片                 */
+        /* ============================================ */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem; max-width: 1100px;
+            perspective: 1200px;
+        }
+        .project-card {
+            position: relative;
+            background: linear-gradient(160deg, #131a3e, #0a0e27);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 240px;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .project-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, transparent 40%, rgba(0,245,255,0.08) 60%, transparent 80%);
+            opacity: 0; transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        .project-card:hover {
+            transform: translateY(-20px) rotateX(8deg) rotateY(-5deg);
+            box-shadow:
+                0 40px 80px rgba(0,0,0,0.5),
+                0 0 50px rgba(0,245,255,0.2);
+            border-color: rgba(0,245,255,0.3);
+        }
+        .project-card:hover::before { opacity: 1; }
+        .project-card:nth-child(2):hover { box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 50px rgba(255,46,99,0.2); border-color: rgba(255,46,99,0.3); }
+        .project-card:nth-child(3):hover { box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 50px rgba(255,230,109,0.2); border-color: rgba(255,230,109,0.3); }
+        .project-card:nth-child(4):hover { box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 50px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.3); }
+        .project-card:nth-child(5):hover { box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 50px rgba(0,245,255,0.2); border-color: rgba(0,245,255,0.3); }
+        .project-card:nth-child(6):hover { box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 50px rgba(255,46,99,0.2); border-color: rgba(255,46,99,0.3); }
+        .project-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700;
+            margin-bottom: 1.2rem;
+            transform: translateZ(40px);
+        }
+        .project-card:nth-child(1) .project-icon { background: linear-gradient(135deg, var(--neon-cyan), #0099b8); color: var(--bg); }
+        .project-card:nth-child(2) .project-icon { background: linear-gradient(135deg, var(--neon-pink), #b01846); color: var(--text); }
+        .project-card:nth-child(3) .project-icon { background: linear-gradient(135deg, var(--neon-yellow), #b09030); color: var(--bg); }
+        .project-card:nth-child(4) .project-icon { background: linear-gradient(135deg, var(--neon-purple), #6b21a8); color: var(--text); }
+        .project-card:nth-child(5) .project-icon { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: var(--bg); }
+        .project-card:nth-child(6) .project-icon { background: linear-gradient(135deg, var(--neon-pink), var(--neon-yellow)); color: var(--bg); }
+        .project-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; transform: translateZ(30px); }
+        .project-card p { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1rem; transform: translateZ(20px); }
+        .project-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; transform: translateZ(15px); }
+        .tag {
+            font-size: 0.7rem; padding: 0.2rem 0.6rem;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .project-link {
+            position: absolute; bottom: 1.5rem; right: 1.5rem;
+            color: var(--neon-cyan); font-size: 1.2rem;
+            transform: translateZ(50px);
+            transition: transform 0.3s;
+        }
+        .project-card:hover .project-link { transform: translateZ(50px) translateX(5px); }
+
+        /* ============================================ */
+        /* 模块 5: 联系名片 - 3D 翻转                   */
+        /* ============================================ */
+        .business-card-stage {
+            perspective: 1500px;
+            width: 420px; height: 260px;
+        }
+        .business-card {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4,0,0.2,1);
+        }
+        .business-card:hover { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; inset: 0;
+            border-radius: 16px;
+            backface-visibility: hidden;
+            padding: 2rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .card-front {
+            background: linear-gradient(135deg, #1a2348 0%, #0a0e27 100%);
+            border: 1px solid rgba(0,245,255,0.2);
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-front::before {
+            content: ''; position: absolute; top: -50%; right: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,245,255,0.15), transparent 50%);
+            pointer-events: none;
+        }
+        .card-front-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; }
+        .card-logo {
+            font-size: 1.8rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card-deco {
+            width: 40px; height: 40px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 50%;
+            position: relative;
+        }
+        .card-deco::before {
+            content: ''; position: absolute; inset: 6px;
+            background: var(--neon-cyan); border-radius: 50%;
+            opacity: 0.6;
+        }
+        .card-front-bottom { position: relative; }
+        .card-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .card-title { color: var(--neon-cyan); font-size: 0.9rem; font-family: 'JetBrains Mono', monospace; }
+        .card-back {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1240 100%);
+            border: 1px solid rgba(255,46,99,0.2);
+            transform: rotateY(180deg);
+            display: flex; flex-direction: column;
+            justify-content: center; gap: 0.8rem;
+        }
+        .card-back::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-yellow));
+        }
+        .contact-item {
+            display: flex; align-items: center; gap: 0.8rem;
+            color: var(--text-dim); font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .contact-item span { color: var(--neon-pink); font-weight: 700; }
+        .contact-hint {
+            margin-top: 1.5rem; color: var(--text-dim);
+            font-size: 0.8rem; font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 900px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { gap: 1rem; }
+            section { padding: 6rem 1.5rem 3rem; }
+            .section-heading { font-size: 2rem; }
+            .about-grid { grid-template-columns: 1fr; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .folders { gap: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Hello, World!</h1>
-        <p>这是 mcptest 仓库的首页</p>
-        <a class="btn" href="https://github.com/McDaniel2/mcptest">查看仓库</a>
-        <div class="meta">由 GitHub MCP 创建 · 2026-11-02</div>
-    </div>
+    <!-- 导航 -->
+    <nav>
+        <div class="logo">McDaniel.dev</div>
+        <div class="nav-links">
+            <a href="#hero">首页</a>
+            <a href="#about">关于</a>
+            <a href="#skills">技能</a>
+            <a href="#projects">项目</a>
+            <a href="#contact">联系</a>
+        </div>
+    </nav>
+
+    <!-- 模块 1: Hero 立体工牌 -->
+    <section id="hero">
+        <div class="lanyard" id="lanyard">
+            <div class="lanyard-ring"></div>
+            <div class="lanyard-string"></div>
+            <div class="badge" id="badge">
+                <!-- 正面 -->
+                <div class="badge-face badge-front">
+                    <div class="badge-header">STAFF BADGE · 2026</div>
+                    <div class="avatar">M</div>
+                    <div class="badge-name">McDaniel</div>
+                    <div class="badge-role">Full-Stack Engineer</div>
+                    <div class="badge-info">
+                        <span>ID<strong>#0021</strong></span>
+                        <span>DEPT<strong>R&D</strong></span>
+                        <span>SINCE<strong>2021</strong></span>
+                    </div>
+                </div>
+                <!-- 背面 -->
+                <div class="badge-face badge-back">
+                    <div class="qr-mock"></div>
+                    <h3>扫一扫</h3>
+                    <p>查看完整简历 · hover 翻转回正面</p>
+                </div>
+            </div>
+        </div>
+        <div class="hero-intro">
+            <h1>你好，我是 <strong>McDaniel</strong></h1>
+            <p>用代码构建立体世界 · 悬浮工牌查看背面</p>
+        </div>
+        <div class="scroll-hint">↓ SCROLL</div>
+    </section>
+
+    <!-- 模块 2: 关于我 - 3D 视差卡片 -->
+    <section id="about">
+        <div class="section-title">01 / ABOUT</div>
+        <h2 class="section-heading">关于<span>我</span></h2>
+        <div class="about-stage" id="aboutStage">
+            <div class="about-card" id="aboutCard">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <h3>代码 · 设计 · 立体感</h3>
+                        <p>我是一名热衷于打造有质感、有交互的 Web 体验的全栈工程师。善于在前端中融入 3D 视差、立体卡片与微动效，让每一次点击都成为愉悦的瞬间。</p>
+                        <p>移动鼠标，这张卡片会跟随你的视线倾斜 —— 这就是我对“立体网页”的理解。</p>
+                    </div>
+                    <div class="about-stats">
+                        <div class="stat-item">
+                            <strong>5+</strong>
+                            <span>年开发经验</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>48</strong>
+                            <span>上线项目</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>12k</strong>
+                            <span>GitHub Stars</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模块 3: 技能 - 立体文件夹 -->
+    <section id="skills">
+        <div class="section-title">02 / SKILLS</div>
+        <h2 class="section-heading">技能<span>文件夹</span></h2>
+        <div class="folders">
+            <div class="folder">
+                <div class="folder-tab"></div>
+                <div class="folder-body">
+                    <h3>// Frontend</h3>
+                    <div class="skill-list">
+                        <div class="skill-pill">React · Vue</div>
+                        <div class="skill-pill">TypeScript</div>
+                        <div class="skill-pill">Three.js · WebGL</div>
+                        <div class="skill-pill">CSS 3D / Animations</div>
+                    </div>
+                </div>
+            </div>
+            <div class="folder">
+                <div class="folder-tab"></div>
+                <div class="folder-body">
+                    <h3>// Backend</h3>
+                    <div class="skill-list">
+                        <div class="skill-pill">Node.js · Nest</div>
+                        <div class="skill-pill">Python · FastAPI</div>
+                        <div class="skill-pill">Go · Gin</div>
+                        <div class="skill-pill">PostgreSQL · Redis</div>
+                    </div>
+                </div>
+            </div>
+            <div class="folder">
+                <div class="folder-tab"></div>
+                <div class="folder-body">
+                    <h3>// DevOps</h3>
+                    <div class="skill-list">
+                        <div class="skill-pill">Docker · K8s</div>
+                        <div class="skill-pill">GitHub Actions</div>
+                        <div class="skill-pill">AWS · Cloudflare</div>
+                        <div class="skill-pill">Nginx · CI/CD</div>
+                    </div>
+                </div>
+            </div>
+            <div class="folder">
+                <div class="folder-tab"></div>
+                <div class="folder-body">
+                    <h3>// Design</h3>
+                    <div class="skill-list">
+                        <div class="skill-pill">Figma · Sketch</div>
+                        <div class="skill-pill">Motion Design</div>
+                        <div class="skill-pill">UI / UX</div>
+                        <div class="skill-pill">3D Modeling</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模块 4: 项目墙 -->
+    <section id="projects">
+        <div class="section-title">03 / WORKS</div>
+        <h2 class="section-heading">项目<span>墙</span></h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-icon">N</div>
+                <h3>Nebula UI</h3>
+                <p>一套带 3D 视差的 React 组件库，已被 2k+ 项目使用。</p>
+                <div class="project-tags"><span class="tag">React</span><span class="tag">TS</span><span class="tag">CSS3D</span></div>
+                <div class="project-link">→</div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon">P</div>
+                <h3>Pulse Analytics</h3>
+                <p>实时数据可视化平台，支持百万级数据点流畅渲染。</p>
+                <div class="project-tags"><span class="tag">D3</span><span class="tag">WebGL</span><span class="tag">Go</span></div>
+                <div class="project-link">→</div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon">A</div>
+                <h3>Aurora Editor</h3>
+                <p>带协作光标的在线代码编辑器，延迟低于 50ms。</p>
+                <div class="project-tags"><span class="tag">CRDT</span><span class="tag">WS</span><span class="tag">Monaco</span></div>
+                <div class="project-link">→</div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon">V</div>
+                <h3>Vortex Mail</h3>
+                <p>极简邮件客户端，主打键盘流与命令面板交互。</p>
+                <div class="project-tags"><span class="tag">Electron</span><span class="tag">IMAP</span></div>
+                <div class="project-link">→</div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon">S</div>
+                <h3>Stellar Notes</h3>
+                <p>支持 3D 卡片堆叠的笔记应用，本地优先架构。</p>
+                <div class="project-tags"><span class="tag">Tauri</span><span class="tag">Rust</span></div>
+                <div class="project-link">→</div>
+            </div>
+            <div class="project-card">
+                <div class="project-icon">Q</div>
+                <h3>Quasar Chat</h3>
+                <p>端到端加密的团队聊天，自带立体消息卡片动效。</p>
+                <div class="project-tags"><span class="tag">E2EE</span><span class="tag">WS</span></div>
+                <div class="project-link">→</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 模块 5: 联系名片 -->
+    <section id="contact">
+        <div class="section-title">04 / CONTACT</div>
+        <h2 class="section-heading">联系<span>名片</span></h2>
+        <div class="business-card-stage">
+            <div class="business-card">
+                <!-- 正面 -->
+                <div class="card-face card-front">
+                    <div class="card-front-top">
+                        <div class="card-logo">M.dev</div>
+                        <div class="card-deco"></div>
+                    </div>
+                    <div class="card-front-bottom">
+                        <div class="card-name">McDaniel</div>
+                        <div class="card-title">Full-Stack Engineer</div>
+                    </div>
+                </div>
+                <!-- 背面 -->
+                <div class="card-face card-back">
+                    <div class="contact-item"><span>Email</span> mcdaniel@example.dev</div>
+                    <div class="contact-item"><span>GitHub</span> @McDaniel2</div>
+                    <div class="contact-item"><span>Twitter</span> @mcdaniel_dev</div>
+                    <div class="contact-item"><span>Location</span> Shanghai · CN</div>
+                </div>
+            </div>
+        </div>
+        <div class="contact-hint">HOVER TO FLIP · 悬浮翻转名片</div>
+    </section>
+
+    <script>
+        // 关于我卡片：鼠标视差跟随
+        const aboutCard = document.getElementById('aboutCard');
+        const aboutStage = document.getElementById('aboutStage');
+        aboutStage.addEventListener('mousemove', (e) => {
+            const rect = aboutStage.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            aboutCard.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
+        });
+        aboutStage.addEventListener('mouseleave', () => {
+            aboutCard.style.transform = 'rotateY(0) rotateX(0)';
+        });
+
+        // Hero 工牌：轻微鼠标跟随（在 hover 翻转之上叠加摆动）
+        const hero = document.getElementById('hero');
+        const lanyard = document.getElementById('lanyard');
+        hero.addEventListener('mousemove', (e) => {
+            const rect = hero.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            lanyard.style.transform = `rotateY(${x * 15}deg) rotateX(${-y * 10}deg)`;
+        });
+        hero.addEventListener('mouseleave', () => {
+            lanyard.style.transform = 'rotateY(0) rotateX(0)';
+        });
+
+        // 滚动渐入动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll('.folder, .project-card, .stat-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s, transform 0.8s';
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>
